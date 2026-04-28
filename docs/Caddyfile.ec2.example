@@ -25,6 +25,11 @@
 
 	preview_router {
 		db_dsn                "postgres://user:password@rds-host:5432/dbname?sslmode=require"
+		db_table              vite_studio_domain_mappings
+		db_response_column    raw_response
+		db_hostname_column    hostname
+		db_status_column      status
+		db_status_value       live
 		cache_ttl             5m
 		default_port          5173
 		allowed_domain_suffix .preview.example.com

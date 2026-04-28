@@ -18,7 +18,8 @@ type rawResponse struct {
 	Status      string `json:"status"`
 }
 
-const lookupQuery = `SELECT raw_response FROM vite_studio_domain_mappings WHERE hostname = $1 AND status = 'live' LIMIT 1`
+// lookupQuery is built dynamically in Provision() from Caddyfile config:
+//   db_table, db_response_column, db_hostname_column, db_status_column
 
 // resolveUpstream returns the upstream target for a hostname, using the
 // in-memory cache and falling back to the database with singleflight
@@ -66,7 +67,7 @@ func (h *PreviewRouter) queryDB(ctx context.Context, hostname string) (upstreamT
 	)
 
 	var rawJSON []byte
-	err := h.pool.QueryRow(queryCtx, lookupQuery, hostname).Scan(&rawJSON)
+	err := h.pool.QueryRow(queryCtx, h.lookupQuery, hostname, h.DBStatusValue).Scan(&rawJSON)
 	queryDur := time.Since(start)
 
 	if err != nil {

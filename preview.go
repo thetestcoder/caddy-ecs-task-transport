@@ -64,6 +64,13 @@ type PreviewRouter struct {
 	// Path that returns a lightweight health response without touching DB.
 	HealthPath string `json:"health_path,omitempty"`
 
+	// Database table and column names for the mapping query.
+	DBTable          string `json:"db_table,omitempty"`
+	DBResponseColumn string `json:"db_response_column,omitempty"`
+	DBHostnameColumn string `json:"db_hostname_column,omitempty"`
+	DBStatusColumn   string `json:"db_status_column,omitempty"`
+	DBStatusValue    string `json:"db_status_value,omitempty"`
+
 	logger        *zap.Logger
 	pool          *pgxpool.Pool
 	cache         *hostCache
@@ -74,6 +81,7 @@ type PreviewRouter struct {
 	cancel        context.CancelFunc
 	metrics       *routerMetrics
 	allowedSuffix string
+	lookupQuery   string
 }
 
 // Interface guards.
@@ -113,8 +121,27 @@ func (h *PreviewRouter) Provision(ctx caddy.Context) error {
 	if h.HealthPath == "" {
 		h.HealthPath = "/__health"
 	}
+	if h.DBTable == "" {
+		h.DBTable = "vite_studio_domain_mappings"
+	}
+	if h.DBResponseColumn == "" {
+		h.DBResponseColumn = "raw_response"
+	}
+	if h.DBHostnameColumn == "" {
+		h.DBHostnameColumn = "hostname"
+	}
+	if h.DBStatusColumn == "" {
+		h.DBStatusColumn = "status"
+	}
+	if h.DBStatusValue == "" {
+		h.DBStatusValue = "live"
+	}
 
 	h.allowedSuffix = strings.ToLower(strings.TrimSpace(h.AllowedDomainSuffix))
+	h.lookupQuery = fmt.Sprintf(
+		`SELECT %q FROM %q WHERE %q = $1 AND %q = $2 LIMIT 1`,
+		h.DBResponseColumn, h.DBTable, h.DBHostnameColumn, h.DBStatusColumn,
+	)
 
 	// TTL cache
 	h.cache = newHostCache(time.Duration(h.CacheTTL))
@@ -162,6 +189,12 @@ func (h *PreviewRouter) Provision(ctx caddy.Context) error {
 		zap.String("health_path", h.HealthPath),
 		zap.Duration("db_query_timeout", time.Duration(h.DBQueryTimeout)),
 		zap.Duration("upstream_timeout", time.Duration(h.UpstreamTimeout)),
+		zap.String("db_table", h.DBTable),
+		zap.String("db_response_column", h.DBResponseColumn),
+		zap.String("db_hostname_column", h.DBHostnameColumn),
+		zap.String("db_status_column", h.DBStatusColumn),
+		zap.String("db_status_value", h.DBStatusValue),
+		zap.String("lookup_query", h.lookupQuery),
 	)
 	return nil
 }

@@ -59,6 +59,11 @@ All options are available as Caddyfile subdirectives and JSON fields.
 | Directive | JSON field | Description | Default |
 |-----------|-----------|-------------|---------|
 | `db_dsn` | `db_dsn` | PostgreSQL connection string. **Required.** Written directly in the Caddyfile. | — |
+| `db_table` | `db_table` | Table name for the mapping lookup. | `vite_studio_domain_mappings` |
+| `db_response_column` | `db_response_column` | Column containing the JSONB upstream data. | `raw_response` |
+| `db_hostname_column` | `db_hostname_column` | Column to match the request hostname against. | `hostname` |
+| `db_status_column` | `db_status_column` | Column used to filter active mappings. | `status` |
+| `db_status_value` | `db_status_value` | Value the status column must equal. | `live` |
 | `cache_ttl` | `cache_ttl` | How long hostname→upstream mappings are cached per Caddy task. | `5m` |
 | `default_port` | `default_port` | Fallback port when `preview_port` is missing from the DB record. | `5173` |
 | `allowed_domain_suffix` | `allowed_domain_suffix` | Only hostnames ending with this suffix are accepted. Include the leading dot. | `.preview.example.com` |
@@ -81,9 +86,14 @@ version control. It is already listed in `.gitignore`.**
     encode zstd gzip
 
     preview_router {
-        db_dsn              "postgres://user:password@rds-host:5432/dbname?sslmode=require"
-        cache_ttl           5m
-        default_port        5173
+        db_dsn                "postgres://user:password@rds-host:5432/dbname?sslmode=require"
+        db_table              vite_studio_domain_mappings
+        db_response_column    raw_response
+        db_hostname_column    hostname
+        db_status_column      status
+        db_status_value       live
+        cache_ttl             5m
+        default_port          5173
         allowed_domain_suffix .preview.example.com
     }
 }

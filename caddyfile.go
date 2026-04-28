@@ -24,6 +24,11 @@ func parseCaddyfile(h httpcaddyfile.Helper) (caddyhttp.MiddlewareHandler, error)
 //
 //	preview_router {
 //	    db_dsn                <dsn>
+//	    db_table              <table>
+//	    db_response_column    <column>
+//	    db_hostname_column    <column>
+//	    db_status_column      <column>
+//	    db_status_value       <value>
 //	    cache_ttl             <duration>
 //	    default_port          <port>
 //	    allowed_domain_suffix <suffix>
@@ -40,6 +45,36 @@ func (h *PreviewRouter) UnmarshalCaddyfile(d *caddyfile.Dispenser) error {
 					return d.ArgErr()
 				}
 				h.DBDSN = d.Val()
+
+			case "db_table":
+				if !d.NextArg() {
+					return d.ArgErr()
+				}
+				h.DBTable = d.Val()
+
+			case "db_response_column":
+				if !d.NextArg() {
+					return d.ArgErr()
+				}
+				h.DBResponseColumn = d.Val()
+
+			case "db_hostname_column":
+				if !d.NextArg() {
+					return d.ArgErr()
+				}
+				h.DBHostnameColumn = d.Val()
+
+			case "db_status_column":
+				if !d.NextArg() {
+					return d.ArgErr()
+				}
+				h.DBStatusColumn = d.Val()
+
+			case "db_status_value":
+				if !d.NextArg() {
+					return d.ArgErr()
+				}
+				h.DBStatusValue = d.Val()
 
 			case "cache_ttl":
 				if !d.NextArg() {
