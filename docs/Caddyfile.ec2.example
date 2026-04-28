@@ -1,0 +1,32 @@
+# Production Caddyfile for preview_router behind ALB.
+#
+# TLS terminates at the ALB (ACM wildcard cert), so Caddy listens on
+# plain HTTP.
+#
+# WARNING: This file contains database credentials.
+# Do NOT commit it to version control.
+
+{
+	# Disable auto-HTTPS since ALB handles TLS.
+	auto_https off
+
+	# Place the custom directive before reverse_proxy in the handler order.
+	order preview_router before reverse_proxy
+}
+
+:8080 {
+	encode zstd gzip
+
+	log {
+		output stdout
+		format json
+		level INFO
+	}
+
+	preview_router {
+		db_dsn                "postgres://user:password@rds-host:5432/dbname?sslmode=require"
+		cache_ttl             5m
+		default_port          5173
+		allowed_domain_suffix .preview.example.com
+	}
+}
