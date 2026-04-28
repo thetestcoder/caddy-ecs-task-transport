@@ -47,7 +47,7 @@ WORKDIR /src
 COPY . .
 RUN go mod tidy
 RUN xcaddy build v2.9.1 \
-      --with github.com/example/caddy-ecs-task-transport=. \
+      --with github.com/thetestcoder/caddy-ecs-task-transport=. \
       --output /usr/local/bin/caddy
 
 FROM debian:bookworm-slim
@@ -165,12 +165,12 @@ go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
 ### Build
 
 ```bash
-git clone https://github.com/example/caddy-ecs-task-transport.git
+git clone https://github.com/thetestcoder/caddy-ecs-task-transport.git
 cd caddy-ecs-task-transport
 go mod tidy
 
 xcaddy build v2.9.1 \
-  --with github.com/example/caddy-ecs-task-transport=. \
+  --with github.com/thetestcoder/caddy-ecs-task-transport=. \
   --output ./caddy
 
 # Install

@@ -32,11 +32,11 @@ Route53  →  ALB (443, ACM wildcard)  →  Caddy preview_router (ECS, N tasks)
 ```bash
 # Local development (replace path with your clone location)
 xcaddy build v2.9.1 \
-  --with github.com/example/caddy-ecs-task-transport=/path/to/caddy-ecs-task-transport
+  --with github.com/thetestcoder/caddy-ecs-task-transport=/path/to/caddy-ecs-task-transport
 
 # From a published module
 xcaddy build v2.9.1 \
-  --with github.com/example/caddy-ecs-task-transport@latest
+  --with github.com/thetestcoder/caddy-ecs-task-transport@latest
 ```
 
 Before building, resolve indirect Go module dependencies:

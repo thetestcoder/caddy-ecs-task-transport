@@ -1,4 +1,4 @@
-module github.com/yourorg/caddy-ecs-task-transport
+module github.com/thetestcoder/caddy-ecs-task-transport
 
 go 1.22.0
 
